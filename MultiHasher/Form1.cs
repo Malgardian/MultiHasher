@@ -20,6 +20,7 @@ namespace MultiHasher
         }
 
         string logfilepath = Directory.GetCurrentDirectory() + "\\multihasher.log";
+        int filecount;
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -78,6 +79,9 @@ namespace MultiHasher
             button1.Enabled = false;
             button2.Enabled = false;
             button3.Enabled = false;
+            progressBar1.Enabled = true;
+            progressBar1.Visible = true;
+            progressBar1.Value = 0;
             //string dirpath = textBox1.Text;
             //calculate_hashes_directory(dirpath);
             backgroundWorker1.RunWorkerAsync();
@@ -94,12 +98,15 @@ namespace MultiHasher
             }
 
             FileInfo[] files = dir.GetFiles();
+
+            filecount = Directory.EnumerateFiles(dirpath, "*", SearchOption.AllDirectories).Count();
+
             foreach (FileInfo file in files)
             {
                 string filepath = file.FullName;
                 string filehash_md5 = calc_hash_md5(file.FullName);
                 string filehash_sha256 = calc_hash_sha256(file.FullName);
-                string[] filedata = { filepath, filehash_md5, filehash_sha256 };
+                string[] filedata = { filepath, filehash_md5, filehash_sha256, };
                 backgroundWorker1.ReportProgress(0, filedata);
                 //ListViewItem lvi = new ListViewItem(filedata);
                 //listView1.Items.Add(lvi);
@@ -158,6 +165,13 @@ namespace MultiHasher
             //listView1.BeginUpdate();
             listView1.Items.Add(lvi);
             //listView1.EndUpdate();
+            if (progressBar1.Value == 0)
+            {
+                progressBar1.Maximum = filecount;
+                //MessageBox.Show(filecount.ToString());
+                progressBar1.Step = 1;
+            }
+            progressBar1.PerformStep();
         }
 
         private void button4_Click(object sender, EventArgs e)
